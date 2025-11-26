@@ -34,6 +34,9 @@ export default function Header() {
             <Link href="/subscribe" className="text-muted-foreground hover:text-foreground transition">
               Subscribe
             </Link>
+            <Link href="/admin/login" className="text-muted-foreground hover:text-foreground transition">
+              Admin
+            </Link>
           </nav>
 
           {/* Right Actions */}
@@ -66,6 +69,9 @@ export default function Header() {
             </Link>
             <Link href="/subscribe" className="text-foreground hover:text-primary transition py-2">
               Subscribe
+            </Link>
+            <Link href="/admin/login" className="text-foreground hover:text-primary transition py-2">
+              Admin
             </Link>
           </nav>
         )}
