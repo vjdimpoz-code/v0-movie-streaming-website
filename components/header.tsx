@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import { useState } from "react"
-import { Menu, X, Search, User } from "lucide-react"
+import { Menu, X, Search } from "lucide-react"
 import { Button } from "@/components/ui/button"
 
 export default function Header() {
@@ -42,9 +42,7 @@ export default function Header() {
               <Search className="w-5 h-5 text-foreground" />
             </Link>
             <Link href="/account">
-              <Button variant="ghost" size="icon">
-                <User className="w-5 h-5" />
-              </Button>
+              <Button className="bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg">Sign In</Button>
             </Link>
 
             {/* Mobile Menu Button */}

@@ -8,7 +8,6 @@ import { Button } from "@/components/ui/button"
 import { Eye, EyeOff } from "lucide-react"
 
 export default function SignupPage() {
-  const [name, setName] = useState("")
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [confirmPassword, setConfirmPassword] = useState("")
@@ -30,8 +29,8 @@ export default function SignupPage() {
 
     // Simulate signup
     setTimeout(() => {
-      if (name && email && password) {
-        console.log("Signing up:", { name, email, password })
+      if (email && password) {
+        console.log("Signing up:", { email, password })
         // In real app, redirect to dashboard or login
         setIsLoading(false)
       } else {
@@ -43,66 +42,43 @@ export default function SignupPage() {
 
   return (
     <main className="min-h-screen bg-background flex items-center justify-center px-4">
-      <div className="w-full max-w-md">
-        {/* Logo */}
-        <div className="flex items-center justify-center gap-2 mb-10">
+      <div className="w-full max-w-sm">
+        <div className="flex items-center justify-center gap-2 mb-12">
           <div className="w-10 h-10 bg-primary rounded-lg flex items-center justify-center">
-            <span className="text-primary-foreground font-bold text-xl">S</span>
+            <span className="text-primary-foreground font-bold text-xl">D</span>
           </div>
-          <span className="text-2xl font-bold text-foreground">StreamFlix</span>
+          <span className="text-2xl font-bold text-foreground">DIMPOZ MOVIES</span>
         </div>
 
         {/* Signup Form */}
         <div className="bg-card border border-border rounded-lg p-8">
           <h1 className="text-3xl font-bold text-foreground mb-2 text-center">Create Account</h1>
-          <p className="text-muted-foreground text-center mb-8">Join StreamFlix and start streaming today</p>
+          <p className="text-muted-foreground text-center mb-8">Join and start streaming</p>
 
-          <form onSubmit={handleSubmit} className="space-y-4">
-            {/* Name Input */}
-            <div>
-              <label htmlFor="name" className="block text-sm font-medium text-foreground mb-2">
-                Full Name
-              </label>
-              <input
-                id="name"
-                type="text"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                placeholder="John Doe"
-                className="w-full px-4 py-3 bg-background border border-border text-foreground rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
-                disabled={isLoading}
-              />
-            </div>
-
+          <form onSubmit={handleSubmit} className="space-y-5">
             {/* Email Input */}
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-foreground mb-2">
-                Email Address
-              </label>
               <input
                 id="email"
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="you@example.com"
-                className="w-full px-4 py-3 bg-background border border-border text-foreground rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                placeholder="Email"
+                className="w-full px-4 py-3 bg-background border border-border text-foreground rounded-lg focus:outline-none focus:ring-2 focus:ring-primary placeholder-muted-foreground"
                 disabled={isLoading}
               />
             </div>
 
             {/* Password Input */}
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-foreground mb-2">
-                Password
-              </label>
               <div className="relative">
                 <input
                   id="password"
                   type={showPassword ? "text" : "password"}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  placeholder="••••••••"
-                  className="w-full px-4 py-3 bg-background border border-border text-foreground rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                  placeholder="Password"
+                  className="w-full px-4 py-3 bg-background border border-border text-foreground rounded-lg focus:outline-none focus:ring-2 focus:ring-primary placeholder-muted-foreground"
                   disabled={isLoading}
                 />
                 <button
@@ -118,17 +94,14 @@ export default function SignupPage() {
 
             {/* Confirm Password Input */}
             <div>
-              <label htmlFor="confirmPassword" className="block text-sm font-medium text-foreground mb-2">
-                Confirm Password
-              </label>
               <div className="relative">
                 <input
                   id="confirmPassword"
                   type={showConfirmPassword ? "text" : "password"}
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
-                  placeholder="••••••••"
-                  className="w-full px-4 py-3 bg-background border border-border text-foreground rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                  placeholder="Confirm Password"
+                  className="w-full px-4 py-3 bg-background border border-border text-foreground rounded-lg focus:outline-none focus:ring-2 focus:ring-primary placeholder-muted-foreground"
                   disabled={isLoading}
                 />
                 <button
@@ -153,32 +126,24 @@ export default function SignupPage() {
             <Button
               type="submit"
               disabled={isLoading}
-              className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-semibold py-3 rounded-lg transition mt-6"
+              className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-semibold py-3 rounded-lg transition mt-8"
             >
-              {isLoading ? "Creating account..." : "Sign Up"}
+              {isLoading ? "Creating account..." : "Create Account"}
             </Button>
           </form>
 
-          {/* Sign In Link */}
-          <p className="text-center text-muted-foreground mt-6">
-            Already have an account?{" "}
-            <Link href="/auth/login" className="text-primary hover:text-primary/90 font-semibold transition">
-              Sign in
+          <div className="mt-8 pt-6 border-t border-border">
+            <p className="text-center text-muted-foreground text-sm mb-4">Already have an account?</p>
+            <Link href="/auth/login">
+              <Button
+                variant="outline"
+                className="w-full border-primary text-primary hover:bg-primary/10 py-2 rounded-lg transition bg-transparent"
+              >
+                Sign In
+              </Button>
             </Link>
-          </p>
+          </div>
         </div>
-
-        {/* Footer Info */}
-        <p className="text-center text-xs text-muted-foreground mt-8">
-          By signing up, you agree to our{" "}
-          <Link href="/terms" className="hover:text-foreground transition">
-            Terms of Service
-          </Link>{" "}
-          and{" "}
-          <Link href="/privacy" className="hover:text-foreground transition">
-            Privacy Policy
-          </Link>
-        </p>
       </div>
     </main>
   )
