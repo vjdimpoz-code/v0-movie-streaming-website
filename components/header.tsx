@@ -4,9 +4,11 @@ import Link from "next/link"
 import { useState } from "react"
 import { Menu, X, Search } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { useAuth } from "@/lib/auth-context"
 
 export default function Header() {
   const [isOpen, setIsOpen] = useState(false)
+  const { user, logout } = useAuth()
 
   return (
     <header className="sticky top-0 z-50 bg-background/80 backdrop-blur-md border-b border-border">
@@ -34,9 +36,11 @@ export default function Header() {
             <Link href="/subscribe" className="text-muted-foreground hover:text-foreground transition">
               Subscribe
             </Link>
-            <Link href="/admin/login" className="text-muted-foreground hover:text-foreground transition">
-              Admin
-            </Link>
+            {user?.isAdmin && (
+              <Link href="/admin/dashboard" className="text-muted-foreground hover:text-foreground transition">
+                Admin
+              </Link>
+            )}
           </nav>
 
           {/* Right Actions */}
@@ -44,9 +48,18 @@ export default function Header() {
             <Link href="/search" className="p-2 hover:bg-card rounded-lg transition">
               <Search className="w-5 h-5 text-foreground" />
             </Link>
-            <Link href="/account">
-              <Button className="bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg">Sign In</Button>
-            </Link>
+            {user ? (
+              <div className="flex items-center gap-3">
+                <span className="text-sm text-muted-foreground hidden sm:inline">{user.email}</span>
+                <Button onClick={logout} className="bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg">
+                  Logout
+                </Button>
+              </div>
+            ) : (
+              <Link href="/auth/login">
+                <Button className="bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg">Sign In</Button>
+              </Link>
+            )}
 
             {/* Mobile Menu Button */}
             <button onClick={() => setIsOpen(!isOpen)} className="md:hidden p-2 hover:bg-card rounded-lg transition">
@@ -70,9 +83,11 @@ export default function Header() {
             <Link href="/subscribe" className="text-foreground hover:text-primary transition py-2">
               Subscribe
             </Link>
-            <Link href="/admin/login" className="text-foreground hover:text-primary transition py-2">
-              Admin
-            </Link>
+            {user?.isAdmin && (
+              <Link href="/admin/dashboard" className="text-foreground hover:text-primary transition py-2">
+                Admin
+              </Link>
+            )}
           </nav>
         )}
       </div>

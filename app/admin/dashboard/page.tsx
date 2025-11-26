@@ -3,8 +3,8 @@
 import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
-import { Users, Film, TrendingUp, LogOut, Eye, Edit2, Trash2 } from "lucide-react"
-import { getAdminToken, clearAdminToken } from "@/lib/admin-auth"
+import { Users, Film, TrendingUp, LogOut, Edit2, Trash2, BarChart3 } from "lucide-react"
+import { useAuth } from "@/lib/auth-context"
 
 interface AdminStats {
   totalUsers: number
@@ -30,24 +30,18 @@ interface RecentUser {
 
 export default function AdminDashboard() {
   const router = useRouter()
-  const [isAuthenticated, setIsAuthenticated] = useState(false)
-  const [adminEmail, setAdminEmail] = useState("")
+  const { user, logout } = useAuth()
   const [activeTab, setActiveTab] = useState("overview")
 
   useEffect(() => {
-    // Check admin authentication
-    const token = getAdminToken()
-    if (!token) {
-      router.push("/admin/login")
-      return
+    if (!user?.isAdmin) {
+      router.push("/")
     }
-    setAdminEmail(token)
-    setIsAuthenticated(true)
-  }, [router])
+  }, [user, router])
 
   const handleLogout = () => {
-    clearAdminToken()
-    router.push("/admin/login")
+    logout()
+    router.push("/")
   }
 
   const stats: AdminStats = {
@@ -115,10 +109,10 @@ export default function AdminDashboard() {
     },
   ]
 
-  if (!isAuthenticated) {
+  if (!user?.isAdmin) {
     return (
       <main className="min-h-screen bg-background flex items-center justify-center">
-        <div className="text-muted-foreground">Loading...</div>
+        <div className="text-muted-foreground">Redirecting...</div>
       </main>
     )
   }
@@ -136,7 +130,7 @@ export default function AdminDashboard() {
               <span className="text-lg font-bold text-foreground">ADMIN PANEL</span>
             </div>
             <div className="flex items-center gap-4">
-              <div className="text-sm text-muted-foreground">{adminEmail}</div>
+              <div className="text-sm text-muted-foreground">{user?.email}</div>
               <Button
                 onClick={handleLogout}
                 variant="outline"
@@ -153,10 +147,10 @@ export default function AdminDashboard() {
 
       <div className="px-4 md:px-8 lg:px-12 py-8">
         <div className="max-w-7xl mx-auto">
-          <div className="flex gap-4 mb-8 border-b border-border pb-4">
+          <div className="flex gap-4 mb-8 border-b border-border pb-4 overflow-x-auto">
             <button
               onClick={() => setActiveTab("overview")}
-              className={`px-4 py-2 font-medium transition ${
+              className={`px-4 py-2 font-medium transition whitespace-nowrap ${
                 activeTab === "overview"
                   ? "text-primary border-b-2 border-primary"
                   : "text-muted-foreground hover:text-foreground"
@@ -166,7 +160,7 @@ export default function AdminDashboard() {
             </button>
             <button
               onClick={() => setActiveTab("movies")}
-              className={`px-4 py-2 font-medium transition ${
+              className={`px-4 py-2 font-medium transition whitespace-nowrap ${
                 activeTab === "movies"
                   ? "text-primary border-b-2 border-primary"
                   : "text-muted-foreground hover:text-foreground"
@@ -176,7 +170,7 @@ export default function AdminDashboard() {
             </button>
             <button
               onClick={() => setActiveTab("users")}
-              className={`px-4 py-2 font-medium transition ${
+              className={`px-4 py-2 font-medium transition whitespace-nowrap ${
                 activeTab === "users"
                   ? "text-primary border-b-2 border-primary"
                   : "text-muted-foreground hover:text-foreground"
@@ -185,8 +179,18 @@ export default function AdminDashboard() {
               Users
             </button>
             <button
+              onClick={() => setActiveTab("analytics")}
+              className={`px-4 py-2 font-medium transition whitespace-nowrap ${
+                activeTab === "analytics"
+                  ? "text-primary border-b-2 border-primary"
+                  : "text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              Analytics
+            </button>
+            <button
               onClick={() => setActiveTab("settings")}
-              className={`px-4 py-2 font-medium transition ${
+              className={`px-4 py-2 font-medium transition whitespace-nowrap ${
                 activeTab === "settings"
                   ? "text-primary border-b-2 border-primary"
                   : "text-muted-foreground hover:text-foreground"
@@ -215,13 +219,13 @@ export default function AdminDashboard() {
                     color: "bg-purple-500/20",
                   },
                   {
-                    icon: Eye,
+                    icon: TrendingUp,
                     label: "Total Views",
                     value: stats.totalViews,
                     color: "bg-green-500/20",
                   },
                   {
-                    icon: TrendingUp,
+                    icon: BarChart3,
                     label: "Revenue (UGX)",
                     value: `${(stats.totalRevenue / 1000).toFixed(0)}K`,
                     color: "bg-orange-500/20",
@@ -305,7 +309,12 @@ export default function AdminDashboard() {
             <div>
               <div className="flex items-center justify-between mb-6">
                 <h2 className="text-2xl font-bold text-foreground">Movie Management</h2>
-                <Button className="bg-primary hover:bg-primary/90">Add New Movie</Button>
+                <Button
+                  onClick={() => alert("Add movie feature coming soon!")}
+                  className="bg-primary hover:bg-primary/90"
+                >
+                  Add New Movie
+                </Button>
               </div>
               <div className="bg-card border border-border rounded-lg p-6">
                 <div className="space-y-4">
@@ -322,10 +331,15 @@ export default function AdminDashboard() {
                         </div>
                       </div>
                       <div className="flex gap-2">
-                        <Button size="sm" variant="outline">
+                        <Button size="sm" variant="outline" onClick={() => alert("Edit movie feature coming soon!")}>
                           Edit
                         </Button>
-                        <Button size="sm" variant="outline" className="text-destructive bg-transparent">
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          className="text-destructive bg-transparent"
+                          onClick={() => alert("Delete movie feature coming soon!")}
+                        >
                           Delete
                         </Button>
                       </div>
@@ -339,9 +353,7 @@ export default function AdminDashboard() {
           {/* Users Tab */}
           {activeTab === "users" && (
             <div>
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-2xl font-bold text-foreground">User Management</h2>
-              </div>
+              <h2 className="text-2xl font-bold text-foreground mb-6">User Management</h2>
               <div className="bg-card border border-border rounded-lg p-6">
                 <div className="space-y-4">
                   {recentUsers.map((user) => (
@@ -359,15 +371,65 @@ export default function AdminDashboard() {
                         </div>
                       </div>
                       <div className="flex gap-2">
-                        <Button size="sm" variant="outline">
+                        <Button size="sm" variant="outline" onClick={() => alert("View user feature coming soon!")}>
                           View
                         </Button>
-                        <Button size="sm" variant="outline" className="text-destructive bg-transparent">
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          className="text-destructive bg-transparent"
+                          onClick={() => alert("Deactivate user feature coming soon!")}
+                        >
                           Deactivate
                         </Button>
                       </div>
                     </div>
                   ))}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Analytics Tab */}
+          {activeTab === "analytics" && (
+            <div>
+              <h2 className="text-2xl font-bold text-foreground mb-6">Analytics & Reports</h2>
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div className="bg-card border border-border rounded-lg p-6">
+                  <h3 className="text-lg font-semibold text-foreground mb-4">Top Movies</h3>
+                  <div className="space-y-3">
+                    {[
+                      { title: "Cosmic Explorer", views: 5234 },
+                      { title: "Dark Mysteries", views: 4128 },
+                      { title: "Action Heroes", views: 3891 },
+                    ].map((item, idx) => (
+                      <div
+                        key={idx}
+                        className="flex justify-between items-center p-3 bg-background rounded border border-border/50"
+                      >
+                        <span className="font-medium text-foreground">{item.title}</span>
+                        <span className="text-primary font-semibold">{item.views.toLocaleString()} views</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+                <div className="bg-card border border-border rounded-lg p-6">
+                  <h3 className="text-lg font-semibold text-foreground mb-4">Subscription Revenue</h3>
+                  <div className="space-y-3">
+                    {[
+                      { plan: "1 Month", revenue: "45,000 UGX" },
+                      { plan: "2 Weeks", revenue: "32,500 UGX" },
+                      { plan: "1 Week", revenue: "28,000 UGX" },
+                    ].map((item, idx) => (
+                      <div
+                        key={idx}
+                        className="flex justify-between items-center p-3 bg-background rounded border border-border/50"
+                      >
+                        <span className="font-medium text-foreground">{item.plan}</span>
+                        <span className="text-primary font-semibold">{item.revenue}</span>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               </div>
             </div>
@@ -381,17 +443,23 @@ export default function AdminDashboard() {
                 <div>
                   <h3 className="text-lg font-semibold text-foreground mb-2">Platform Configuration</h3>
                   <p className="text-muted-foreground mb-4">Manage general platform settings and configurations</p>
-                  <Button variant="outline">Configure Settings</Button>
+                  <Button variant="outline" onClick={() => alert("Configuration settings coming soon!")}>
+                    Configure Settings
+                  </Button>
                 </div>
                 <div className="border-t border-border pt-6">
                   <h3 className="text-lg font-semibold text-foreground mb-2">Security</h3>
                   <p className="text-muted-foreground mb-4">Manage admin access and security settings</p>
-                  <Button variant="outline">Manage Access</Button>
+                  <Button variant="outline" onClick={() => alert("Security settings coming soon!")}>
+                    Manage Access
+                  </Button>
                 </div>
                 <div className="border-t border-border pt-6">
                   <h3 className="text-lg font-semibold text-foreground mb-2">System Maintenance</h3>
                   <p className="text-muted-foreground mb-4">Perform system backups and maintenance tasks</p>
-                  <Button variant="outline">Maintenance Tools</Button>
+                  <Button variant="outline" onClick={() => alert("Maintenance tools coming soon!")}>
+                    Maintenance Tools
+                  </Button>
                 </div>
               </div>
             </div>
