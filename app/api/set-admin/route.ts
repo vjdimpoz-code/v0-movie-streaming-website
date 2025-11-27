@@ -1,5 +1,5 @@
 import { type NextRequest, NextResponse } from "next/server"
-import admin from "@/utils/firebaseAdmin"
+import { getAdminApp } from "@/utils/firebaseAdmin"
 
 export async function POST(req: NextRequest) {
   const authHeader = req.headers.get("authorization")
@@ -10,13 +10,15 @@ export async function POST(req: NextRequest) {
   }
 
   try {
+    const adminApp = getAdminApp()
+
     const { uid } = await req.json()
 
     if (!uid) {
       return NextResponse.json({ error: "UID is required" }, { status: 400 })
     }
 
-    await admin.auth().setCustomUserClaims(uid, { admin: true })
+    await adminApp.auth().setCustomUserClaims(uid, { admin: true })
 
     return NextResponse.json({ message: "User is now admin!" }, { status: 200 })
   } catch (err) {

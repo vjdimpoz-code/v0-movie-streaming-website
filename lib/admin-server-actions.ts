@@ -2,20 +2,20 @@
 
 export async function setUserAsAdmin(email?: string, uid?: string) {
   const adminSecret = process.env.ADMIN_SECRET
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000"
 
   if (!adminSecret) {
     throw new Error("ADMIN_SECRET is not configured")
   }
 
   try {
-    const response = await fetch("http://localhost:3000/api/set-admin", {
+    const response = await fetch(`${baseUrl}/api/make-admin`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${adminSecret}`,
       },
       body: JSON.stringify({
-        uid,
         email,
       }),
     })
