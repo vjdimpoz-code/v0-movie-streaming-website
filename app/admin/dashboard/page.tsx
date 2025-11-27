@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Users, Film, TrendingUp, LogOut, Edit2, Trash2, BarChart3 } from "lucide-react"
 import { useAuth } from "@/lib/auth-context"
+import { setUserAsAdmin } from "@/lib/admin-server-actions"
 
 interface AdminStats {
   totalUsers: number
@@ -198,6 +199,16 @@ export default function AdminDashboard() {
             >
               Settings
             </button>
+            <button
+              onClick={() => setActiveTab("admins")}
+              className={`px-4 py-2 font-medium transition whitespace-nowrap ${
+                activeTab === "admins"
+                  ? "text-primary border-b-2 border-primary"
+                  : "text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              Manage Admins
+            </button>
           </div>
 
           {/* Overview Tab */}
@@ -367,7 +378,7 @@ export default function AdminDashboard() {
                           <span className="text-xs bg-primary/20 text-primary px-2 py-1 rounded">
                             {user.subscription}
                           </span>
-                          <span className="text-xs text-muted-foreground">{user.joinedDate}</span>
+                          <span className="text-xs text-muted-foreground">Joined {user.joinedDate}</span>
                         </div>
                       </div>
                       <div className="flex gap-2">
@@ -464,8 +475,133 @@ export default function AdminDashboard() {
               </div>
             </div>
           )}
+
+          {/* Manage Admins Tab */}
+          {activeTab === "admins" && <ManageAdminsTab />}
         </div>
       </div>
     </main>
+  )
+}
+
+function ManageAdminsTab() {
+  const [email, setEmail] = useState("")
+  const [uid, setUid] = useState("")
+  const [loading, setLoading] = useState(false)
+  const [message, setMessage] = useState("")
+  const [error, setError] = useState("")
+  const [adminMode, setAdminMode] = useState<"email" | "uid">("email")
+
+  const handleMakeAdmin = async () => {
+    setLoading(true)
+    setMessage("")
+    setError("")
+
+    try {
+      const result = await setUserAsAdmin(
+        adminMode === "email" ? email : undefined,
+        adminMode === "uid" ? uid : undefined,
+      )
+
+      setMessage(`${adminMode === "email" ? email : uid} is now an admin!`)
+      if (adminMode === "email") setEmail("")
+      else setUid("")
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "An error occurred")
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  return (
+    <div>
+      <h2 className="text-2xl font-bold text-foreground mb-6">Manage Admin Access</h2>
+      <div className="bg-card border border-border rounded-lg p-6 space-y-6">
+        <div>
+          <h3 className="text-lg font-semibold text-foreground mb-4">Grant Admin Privileges</h3>
+          <div className="space-y-4">
+            <div className="flex gap-4">
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="radio"
+                  value="email"
+                  checked={adminMode === "email"}
+                  onChange={(e) => setAdminMode(e.target.value as "email" | "uid")}
+                  className="w-4 h-4"
+                />
+                <span className="text-foreground">By Email</span>
+              </label>
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="radio"
+                  value="uid"
+                  checked={adminMode === "uid"}
+                  onChange={(e) => setAdminMode(e.target.value as "email" | "uid")}
+                  className="w-4 h-4"
+                />
+                <span className="text-foreground">By UID</span>
+              </label>
+            </div>
+
+            {adminMode === "email" ? (
+              <div>
+                <label className="block text-sm font-medium text-foreground mb-2">User Email</label>
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="Enter user email"
+                  className="w-full px-4 py-2 bg-background border border-border rounded-lg text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+                />
+              </div>
+            ) : (
+              <div>
+                <label className="block text-sm font-medium text-foreground mb-2">User UID</label>
+                <input
+                  type="text"
+                  value={uid}
+                  onChange={(e) => setUid(e.target.value)}
+                  placeholder="Enter Firebase user UID"
+                  className="w-full px-4 py-2 bg-background border border-border rounded-lg text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+                />
+              </div>
+            )}
+
+            <Button
+              onClick={handleMakeAdmin}
+              disabled={loading || (adminMode === "email" ? !email : !uid)}
+              className="w-full bg-primary hover:bg-primary/90 text-primary-foreground"
+            >
+              {loading ? "Processing..." : "Grant Admin Access"}
+            </Button>
+
+            {message && (
+              <div className="p-4 bg-green-500/20 border border-green-500/30 rounded-lg">
+                <p className="text-green-400 text-sm">{message}</p>
+              </div>
+            )}
+
+            {error && (
+              <div className="p-4 bg-destructive/20 border border-destructive/30 rounded-lg">
+                <p className="text-destructive text-sm">{error}</p>
+              </div>
+            )}
+          </div>
+        </div>
+
+        <div className="border-t border-border pt-6">
+          <h3 className="text-lg font-semibold text-foreground mb-4">Current Admins</h3>
+          <div className="space-y-2">
+            <div className="p-4 bg-background border border-border/50 rounded-lg flex items-center justify-between">
+              <div>
+                <p className="font-medium text-foreground">vjdimpoz@gmail.com</p>
+                <p className="text-xs text-muted-foreground mt-1">Platform Owner</p>
+              </div>
+              <span className="px-3 py-1 bg-primary/20 text-primary text-xs font-medium rounded">Active</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   )
 }
